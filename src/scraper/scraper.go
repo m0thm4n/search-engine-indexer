@@ -74,11 +74,15 @@ func (s *Scraper) Links() []string {
 
 		linkTag := item
 		href, _ := linkTag.Attr("href")
-		if strings.Contains(href, "/cooking/recipe-ideas") {
+		if strings.Contains(href, "/cooking/recipe-ideas/recipes") && !strings.Contains(href, "media") {
 			if !strings.HasPrefix(href, "#") && !strings.HasPrefix(href, "javascript") {
 				link = s.buildLinks(href)
 				if link != "" {
-					links = append(links, link)
+					for _, rangeLink := range links {
+						if !strings.Contains(link, rangeLink) {
+							links = append(links, link)
+						}
+					}
 				}
 			}
 		}
