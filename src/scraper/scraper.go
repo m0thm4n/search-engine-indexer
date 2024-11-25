@@ -3,9 +3,14 @@ package scraper
 import (
 	"fmt"
 	"net/http"
+	"slices"
 	"strings"
 
 	"github.com/PuerkitoBio/goquery"
+)
+
+var (
+	titles = make([]string, 0)
 )
 
 // Scraper for each website
@@ -64,7 +69,7 @@ func (s *Scraper) buildLinks(href string) string {
 }
 
 // Links returns an array with all the links from the website
-func (s *Scraper) Links() []string {
+func (s *Scraper) Links() ([]string, []string) {
 	links := make([]string, 0)
 
 	var link string
@@ -74,18 +79,20 @@ func (s *Scraper) Links() []string {
 
 		linkTag := item
 		href, _ := linkTag.Attr("href")
+		title := linkTag.Text()
 
-		if strings.Contains(href, "/cooking/recipe-ideas") && !strings.Contains(href, "/recipes") {
+		if strings.Contains(href, "/cooking/recipe-ideas") || strings.Contains(href, "/everyday-cooking/quick-and-easy/") || strings.Contains(href, "/search?q=Chicken") || strings.Contains(href, "/search?q=Tacos") {
 			if !strings.HasPrefix(href, "#") && !strings.HasPrefix(href, "javascript") {
 				link = s.buildLinks(href)
-				if link != "" {
+				if link != "" && !slices.Contains(titles, title) && !slices.Contains(links, link) {
 					links = append(links, link)
+					titles = append(titles, title)
 				}
 			}
 		}
 	})
 
-	return links
+	return links, titles
 }
 
 // MetaDataInformation returns the title and description from the page

@@ -20,7 +20,7 @@ func crawlURL(url string) {
 		return
 	}
 
-	links := s.Links()
+	links, _ := s.Links()
 	fmt.Println(links)
 	title, description := s.MetaDataInformation()
 	body := s.Body()
